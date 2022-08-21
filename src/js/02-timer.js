@@ -1,7 +1,7 @@
 // импорт
 import flatpickr from 'flatpickr';
-import 'flatpickr/dist/flatpickr.min.css';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import 'flatpickr/dist/flatpickr.min.css';
 
 // Доступ к элементам
 const elements = {
@@ -40,31 +40,17 @@ function startTimer(onBtn) {
     }
   }, 1000);
 }
-
 // определение дедлайна
-function convertMs(ms) {
-  // Number of milliseconds per unit of time
-  const second = 1000;
-  const minute = second * 60;
-  const hour = minute * 60;
-  const day = hour * 24;
-
-  // Remaining days
-  const days = pad(Math.floor(ms / day));
-  // Remaining hours
-  const hours = pad(Math.floor((ms % day) / hour));
-  // Remaining minutes
-  const minutes = pad(Math.floor(((ms % day) % hour) / minute));
-  // Remaining seconds
-  const seconds = pad(Math.floor((((ms % day) % hour) % minute) / second));
-
-  return { days, hours, minutes, seconds };
+function newTimer(totalTime) {
+  const seconds = pad(Math.floor((totalTime / 1000) % 60));
+  const minute = pad(Math.floor(totalTime / 1000 / 60) % 60);
+  const hours = pad(Math.floor(totalTime / 1000 / 60 / 60) % 24);
+  const days = pad(Math.floor(totalTime / 1000 / 60 / 60 / 24));
+  return { seconds, minute, hours, days };
 }
-
 function pad(value) {
   return String(value).padStart(2, '0');
 }
-
 // передача данных
 function updateTime({ days, hours, minute, seconds }) {
   elements.spanSeconds.textContent = seconds;
@@ -89,18 +75,26 @@ const options = {
   defaultDate: new Date(),
   // Регулирует шаг ввода минут (включая прокрутку)
   minuteIncrement: 1,
-  // Функция(и) для запуска при каждом закрытии календаря.
+  // Функция для запуска при каждом закрытии календаря.
   onClose(selectedDates) {
     const userTimeNow = Date.now();
     userTime = selectedDates[0];
     if (userTime <= userTimeNow) {
-      Notify.failure(`You haven't made a choice. Do this!`);
+      Notify.failure(`You have not made a choice. Do it!`);
       return;
     }
-    Notify.success(`Thanks for choosing!`);
+    Notify.success(`Thanks for your choosing!`);
     elements.btn.disabled = false;
   },
 };
 
 flatpickr(elements.input, options);
 elements.btn.addEventListener('click', startTimer);
+
+function onStart() {
+  (btnStart.disabled = true),
+    (btnStop.disabled = false),
+    (timerId = setInterval(() => {
+      body.style.background = getRandomHexColor();
+    }, 1000));
+}
